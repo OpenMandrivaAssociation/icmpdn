@@ -10,7 +10,6 @@ Source1:	icmpdnd.init.bz2
 Source2:	icmpdnd.sysconfig.bz2
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
 Since the Linux kernel does not support the ICMP host name
