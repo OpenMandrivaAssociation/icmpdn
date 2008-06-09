@@ -67,12 +67,16 @@ rm -f %{buildroot}/%{_lib}/libnss_icmp.la
 
 %post
 %_post_service icmpdnd
+%if %mdkversion < 200900
 /sbin/ldconfig
+%endif
 
 %preun
 %_preun_service icmpdnd
 
+%if %mdkversion < 200900
 %postun -p /sbin/ldconfig
+%endif
 
 %clean
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
