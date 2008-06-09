@@ -71,7 +71,8 @@ rm -f %{buildroot}/%{_lib}/libnss_icmp.la
 
 %preun
 %_preun_service icmpdnd
-/sbin/ldconfig
+
+%postun -p /sbin/ldconfig
 
 %clean
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
