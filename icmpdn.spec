@@ -1,7 +1,7 @@
 Summary:	ICMP host name utilities
 Name:		icmpdn
 Version:	0.4
-Release:	%mkrel 4
+Release:	%mkrel 5
 License:	GPL
 Group:		System/Servers
 URL:		http://www.dolda2000.com/~fredrik/icmp-dn/
