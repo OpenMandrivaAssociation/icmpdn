@@ -1,7 +1,7 @@
 Summary:	ICMP host name utilities
 Name:		icmpdn
 Version:	0.4
-Release:	%mkrel 5
+Release:	1
 License:	GPL
 Group:		System/Servers
 URL:		http://www.dolda2000.com/~fredrik/icmp-dn/
@@ -10,7 +10,6 @@ Source1:	icmpdnd.init.bz2
 Source2:	icmpdnd.sysconfig.bz2
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
 Since the Linux kernel does not support the ICMP host name
@@ -41,6 +40,7 @@ bzcat %{SOURCE2} > Mandriva/icmpdnd.sysconfig
 
 %build
 rm -f configure
+export CPPFLAGS="-D_GNU_SOURCE"
 libtoolize --copy --force; aclocal -I autotools; autoconf; automake
 
 %configure2_5x \
@@ -51,7 +51,6 @@ libtoolize --copy --force; aclocal -I autotools; autoconf; automake
 %make
 
 %install
-[ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
 
 %makeinstall_std
 
@@ -67,19 +66,11 @@ rm -f %{buildroot}/%{_lib}/libnss_icmp.la
 
 %post
 %_post_service icmpdnd
-%if %mdkversion < 200900
 /sbin/ldconfig
-%endif
 
 %preun
 %_preun_service icmpdnd
-
-%if %mdkversion < 200900
-%postun -p /sbin/ldconfig
-%endif
-
-%clean
-[ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
+/sbin/ldconfig
 
 %files
 %defattr(-,root,root)
@@ -91,4 +82,29 @@ rm -f %{buildroot}/%{_lib}/libnss_icmp.la
 %attr(0755,root,root) /sbin/icmpdnd
 %attr(4755,root,root) /bin/idnlookup
 %{_mandir}/man*/*
+
+
+
+%changelog
+* Wed Jan 02 2008 Olivier Blin <oblin@mandriva.com> 0.4-1mdv2008.1
++ Revision: 140756
+- restore BuildRoot
+
+  + Thierry Vignaud <tvignaud@mandriva.com>
+    - kill re-definition of %%buildroot on Pixel's request
+
+
+* Fri Jul 14 2006 Oden Eriksson <oeriksson@mandriva.com> 0.4-1mdv2007.0
+- 0.4
+
+* Mon Jun 27 2005 Oden Eriksson <oeriksson@mandriva.com> 0.3-1mdk
+- 0.3 (Minor feature enhancements)
+
+* Mon May 23 2005 Oden Eriksson <oeriksson@mandriva.com> 0.1-1mdk
+- icmp-dn/icmpdn
+- use the official tar ball
+- no more sub packages
+
+* Sun May 22 2005 Oden Eriksson <oeriksson@mandriva.com> 0.1-1mdk
+- initial Mandriva package
 
