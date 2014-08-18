@@ -1,0 +1,12 @@
+[Unit]
+Description=ICMP Domain Name responder daemon for Linux
+After=network.target
+
+[Service]
+Type=forking
+EnvironmentFile=-/etc/sysconfig/icmpdnd
+ExecStart=/sbin/icmpdnd $ICMPDND_OPTIONS
+PIDFile=/var/run/icmpdnd.pid
+
+[Install]
+WantedBy=multi-user.target

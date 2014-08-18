@@ -1,15 +1,18 @@
 Summary:	ICMP host name utilities
 Name:		icmpdn
 Version:	0.4
-Release:	1
+Release:	3
 License:	GPL
 Group:		System/Servers
 URL:		http://www.dolda2000.com/~fredrik/icmp-dn/
 Source0:	http://www.dolda2000.com/~fredrik/icmp-dn/%{name}-%{version}.tar.bz2
-Source1:	icmpdnd.init.bz2
-Source2:	icmpdnd.sysconfig.bz2
+Source1:	icmpdnd.service
+Source2:	icmpdnd.sysconfig
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
+Requires(post): systemd-units
+Requires(preun): systemd-units
+Requires(postun): systemd-units
 
 %description
 Since the Linux kernel does not support the ICMP host name
@@ -34,9 +37,6 @@ of its operation:
 
 %setup -q -n %{name}-%{version}
 
-mkdir -p Mandriva
-bzcat %{SOURCE1} > Mandriva/icmpdnd.init
-bzcat %{SOURCE2} > Mandriva/icmpdnd.sysconfig
 
 %build
 rm -f configure
@@ -46,65 +46,50 @@ libtoolize --copy --force; aclocal -I autotools; autoconf; automake
 %configure2_5x \
     --libdir=/%{_lib} \
     --sbindir=/sbin \
-    --bindir=/bin \
-    
+    --bindir=/bin
+
 %make
 
 %install
-
 %makeinstall_std
 
-install -d %{buildroot}%{_initrddir}
 install -d %{buildroot}%{_sysconfdir}/sysconfig
 
-install -m0755 Mandriva/icmpdnd.init %{buildroot}%{_initrddir}/icmpdnd
-install -m0644 Mandriva/icmpdnd.sysconfig %{buildroot}%{_sysconfdir}/sysconfig/icmpdnd
+install -D -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/icmpdnd.service
+install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/sysconfig/icmpdnd
 
 # cleanup
 rm -rf %{buildroot}%{_sysconfdir}/init.d
 rm -f %{buildroot}/%{_lib}/libnss_icmp.la
 
 %post
-%_post_service icmpdnd
+if [ $1 -eq 1 ] ; then 
+    # Initial installation 
+    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+fi
+
 /sbin/ldconfig
 
 %preun
-%_preun_service icmpdnd
-/sbin/ldconfig
+if [ $1 -eq 0 ] ; then
+    # Package removal, not upgrade
+    /bin/systemctl --no-reload disable icmpdnd.service > /dev/null 2>&1 || :
+    /bin/systemctl stop icmpdnd.service > /dev/null 2>&1 || :
+fi
+
+%postun
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+if [ $1 -ge 1 ] ; then
+    # Package upgrade, not uninstall
+    /bin/systemctl try-restart icmpdnd.service >/dev/null 2>&1 || :
+fi
 
 %files
-%defattr(-,root,root)
 %doc AUTHORS COPYING ChangeLog README
-%attr(0755,root,root) %{_initrddir}/icmpdnd
+%{_unitdir}/icmpdnd.service
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/sysconfig/icmpdnd
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/nss-icmp.conf
 %attr(0755,root,root) /%{_lib}/libnss_icmp.so*
 %attr(0755,root,root) /sbin/icmpdnd
 %attr(4755,root,root) /bin/idnlookup
 %{_mandir}/man*/*
-
-
-
-%changelog
-* Wed Jan 02 2008 Olivier Blin <oblin@mandriva.com> 0.4-1mdv2008.1
-+ Revision: 140756
-- restore BuildRoot
-
-  + Thierry Vignaud <tvignaud@mandriva.com>
-    - kill re-definition of %%buildroot on Pixel's request
-
-
-* Fri Jul 14 2006 Oden Eriksson <oeriksson@mandriva.com> 0.4-1mdv2007.0
-- 0.4
-
-* Mon Jun 27 2005 Oden Eriksson <oeriksson@mandriva.com> 0.3-1mdk
-- 0.3 (Minor feature enhancements)
-
-* Mon May 23 2005 Oden Eriksson <oeriksson@mandriva.com> 0.1-1mdk
-- icmp-dn/icmpdn
-- use the official tar ball
-- no more sub packages
-
-* Sun May 22 2005 Oden Eriksson <oeriksson@mandriva.com> 0.1-1mdk
-- initial Mandriva package
-
