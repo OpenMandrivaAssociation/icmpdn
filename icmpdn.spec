@@ -62,27 +62,15 @@ install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/sysconfig/icmpdnd
 rm -rf %{buildroot}%{_sysconfdir}/init.d
 rm -f %{buildroot}/%{_lib}/libnss_icmp.la
 
-%post
-if [ $1 -eq 1 ] ; then 
-    # Initial installation 
-    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
-fi
 
-/sbin/ldconfig
+%post
+%systemd_post %{name}d.service
 
 %preun
-if [ $1 -eq 0 ] ; then
-    # Package removal, not upgrade
-    /bin/systemctl --no-reload disable icmpdnd.service > /dev/null 2>&1 || :
-    /bin/systemctl stop icmpdnd.service > /dev/null 2>&1 || :
-fi
+%systemd_preun %{name}d.service
 
 %postun
-/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-if [ $1 -ge 1 ] ; then
-    # Package upgrade, not uninstall
-    /bin/systemctl try-restart icmpdnd.service >/dev/null 2>&1 || :
-fi
+%systemd_postun_with_restart %{name}d.service
 
 %files
 %doc AUTHORS COPYING ChangeLog README
