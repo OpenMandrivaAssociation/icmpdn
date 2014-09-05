@@ -1,13 +1,14 @@
 Summary:	ICMP host name utilities
 Name:		icmpdn
 Version:	0.4
-Release:	4
+Release:	5
 License:	GPL
 Group:		System/Servers
 URL:		http://www.dolda2000.com/~fredrik/icmp-dn/
 Source0:	http://www.dolda2000.com/~fredrik/icmp-dn/%{name}-%{version}.tar.bz2
 Source1:	icmpdnd.service
 Source2:	icmpdnd.sysconfig
+Source100:	%{name}.rpmlintrc
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
 Requires(post): systemd-units

@@ -1,0 +1,2 @@
+addFilter("devel-file-in-non-devel-package")
+addFilter("incoherent-version-in-soname")
