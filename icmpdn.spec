@@ -4,7 +4,7 @@ Version:	0.4
 Release:	6
 License:	GPL
 Group:		System/Servers
-URL:		http://www.dolda2000.com/~fredrik/icmp-dn/
+URL:		https://www.dolda2000.com/~fredrik/icmp-dn/
 Source0:	http://www.dolda2000.com/~fredrik/icmp-dn/%{name}-%{version}.tar.bz2
 Source1:	icmpdnd.service
 Source2:	icmpdnd.sysconfig
