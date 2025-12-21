@@ -15,6 +15,11 @@ Requires(post): systemd-units
 Requires(preun): systemd-units
 Requires(postun): systemd-units
 
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	libtool-base
+BuildRequires:	slibtool
+BuildRequires:	make
 %description
 Since the Linux kernel does not support the ICMP host name
 facilities as described in RFC 1788, I wrote a simple
